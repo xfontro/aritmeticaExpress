@@ -2,6 +2,14 @@
 // LGPL
 
 var publisher = require('./publisher');
+var args = require('commander');
+
+args
+	.version('0.1')
+	.option('-p, --port [number]', 'client port', process.env.port || 80)
+	.option('-c, --cluster', 'cluster of processes')
+	.option('-t, --processes [number]', 'number of processes')
+	.parse(process.argv);
 
 var api = {
 	add: 
@@ -56,4 +64,15 @@ var api = {
 		}	
 };
 
-publisher.createServer(api, process.env.port);
+if (args.cluster) {
+	require('./clustermanager').childSpawn(
+		args.processes || require('os').cpus().length,
+		function (id) { 
+			console.log('cluster: worker ' + id);
+			publisher.createServer(api, process.env.port); 
+		}
+	);
+} else {
+	console.log('no cluster');
+	publisher.createServer(api, args.port);
+}

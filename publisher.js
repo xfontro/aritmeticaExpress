@@ -27,7 +27,6 @@ var createServer = function (api, port) {
 
 	// expose api
 	for(func in api) {
-		console.log('install:' + func);
 		app.post('/' + func, (function (_f) {
 									var f = _f;
 									return function (req, res) {
@@ -46,7 +45,7 @@ var createServer = function (api, port) {
 	http.createServer(app).listen(
 		app.get('port'), 
 		function () {
-			console.log("server listening on port " + app.get('port'));
+			console.log('server process listening');
 		}
 	);
 };
