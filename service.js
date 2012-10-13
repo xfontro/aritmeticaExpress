@@ -73,6 +73,6 @@ if (args.cluster) {
 		}
 	);
 } else {
-	console.log('no cluster');
+	console.log('no cluster, listen on port ' + args.port);
 	publisher.createServer(api, args.port);
 }

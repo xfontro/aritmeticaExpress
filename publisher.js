@@ -3,11 +3,32 @@
 
 var express = require('express');
 var http = require('http');
+var fs = require('fs');
 
 var createServer = function (api, port) {
 	var app = express();
 
 	app.set('port', port);
+	app.use('/debug2', function(req, res) {
+		var data='';
+		var length = 0;
+		var writeStream = fs.createWriteStream('./output' + (new Date()).getTime() + '.json');
+		
+		req.setEncoding('utf8');
+		req.on('data', function(chunk) { 
+			data += chunk;
+			length += chunk.length;	   
+			writeStream.write(chunk);
+			console.log(chunk.length);
+		});
+
+		req.on('end', function() {
+			writeStream.end();
+			req.body = data;
+			console.log('total = ' + length);
+			res.json(200, {resp: length});
+		});
+	});
 	app.use(express.bodyParser());
 	app.use(app.router);
 
@@ -20,9 +41,18 @@ var createServer = function (api, port) {
 	// production only: if ('production' == app.get('env')) {}
 
 	// all http posts accept json only
-	app.post('/*', function (req, res, next) {
+	app.post('/*', function(req, res, next) {
 		req.accepts('application/json');
 		next();
+	});
+
+	app.post('/debug', function(req, res) {
+		console.log(req);
+		res.json(200, { resp: 'ok' });
+	});
+	app.post('/save', function(req, res) {
+		process.stdout.write('.');
+		res.json(200, { resp: 'ok' });
 	});
 
 	// expose api

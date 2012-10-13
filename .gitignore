@@ -7,6 +7,8 @@ lib-cov
 *.pid
 *.gz
 *.bak
+output*.*
+bigpost.json
 
 pids
 logs
