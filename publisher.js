@@ -30,8 +30,9 @@ var createServer = function (api, port) {
 		app.post('/' + func, (function (_f) {
 									var f = _f;
 									return function (req, res) {
-												api[f](req.body, function(resObj) {
+												api[f](req.body, function(resObj, callback) {
 																		res.json(resObj);
+																		callback();
 																	});
 											}
 								})(func));	

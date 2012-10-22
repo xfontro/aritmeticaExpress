@@ -1,18 +1,16 @@
 var amqp = require('amqp');
 var amqp_hacks = require('./amqp_hacks');
-var connection;
-var resultQ;
+/*var connection;
+var resultQ;*/
 var taskQ;
 
-var start = function start(){
-	connection = amqp.createConnection({ url: 'amqp://localhost'});
+var start = function (){
+	/*connection = amqp.createConnection({ url: 'amqp://localhost'});
 	connection.on('ready', function(){
-		resultQ = connection.queue('resultQueue', {autoDelete: false, durable: true});
-
-	});
+	resultQ = connection.queue('resultQueue', {autoDelete: false, durable: true});*/
 };
 
-var add = function add(args, response) {
+var add = function (args, response) {
 	var result = args[0];
 	console.log("... to add");
 	for(var i=1; i<args.length; ++i) {
@@ -66,18 +64,25 @@ var load = function (args, response) {
 var publish = function (args, response){
 
 	var result = 0;
+	var connection = amqp.createConnection({ url: 'amqp://localhost'});
+	connection.on('ready', function(){
+		var resultQ = connection.queue('resultQueue', {autoDelete: false, durable: true});
+		connection.publish('taskQueue', args, {deliveryMode: 2});
 
-	connection.publish('taskQueue', args, {deliveryMode: 2});
+		resultQ.subscribe({ack: true, prefetchCount: 1}, function(msg){
+			result += msg;
+			//console.log(result);
+			response(result, function(){
+				resultQ.shift();
+				resultQ.close();
+				connection.end();
+	    		connection.destroy();
+			});
 
-	resultQ.subscribe({ack: true, prefetchCount: 1}, function(msg){
-		result += msg;
-		resultQ.shift();
-		console.log(result);
-
-		response(result);
-			//Have to manage the Can't set headers error...!
+		});
 
 	});
+
 };
 
 exports.add = add;
