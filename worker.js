@@ -20,7 +20,7 @@ var connection = amqp.createConnection({url: 'amqp://localhost'});
             }
 
             queue.shift();
-            //console.log(result);
+            //console.log(' [***] ' + result);
             connection.publish('resultQueue', result, {deliveryMode: 2});
         });
     });

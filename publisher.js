@@ -1,50 +1,45 @@
 // Copyright 2012, Jordi Íñigo Griera
 // LGPL
-
-var express = require('express');
 var http = require('http');
-var fs = require('fs');
+var url = require('url');
 
 var createServer = function (api, port) {
-	var app = express();
+	function onRequest(request, response) {
+		var postData = '';
+		var pathname = url.parse(request.url).pathname.split("/")[1];
 
-	app.use(express.bodyParser());
-	app.use(app.router);
+		//console.log("Request for " + pathname + " received.");
 
-	// development only
-	if ('development' == app.get('env')) {
-		app.use(express.logger('dev'));
-		app.use(express.errorHandler());
+		request.setEncoding("utf8");
+
+		request.addListener("data", function (postDataChunk) {
+			postData += postDataChunk;
+			//console.log("Received POST data chunk '" + postDataChunk + "'.");
+		});
+
+		request.addListener("end", function () {
+			try {
+
+				var args = JSON.parse(postData);
+
+				//console.log('The data is : ' + args);
+				api[pathname](args, function (total) {
+
+					var x = JSON.stringify(total);
+					response.writeHead(200, {
+						'Content-Length' : x.length,
+						'Content-Type' : 'application/json'
+					});
+					response.write(x);
+					response.end();
+				});
+			} catch (e) {
+			}
+		});
 	}
 
-	// production only: if ('production' == app.get('env')) {}
+	http.createServer(onRequest).listen(port);
 
-	// all http posts accept json only
-	app.post('/*', function (req, res, next) {
-		req.accepts('application/json');
-		next();
-	});
-
-	// expose api
-	for(func in api) {
-		app.post('/' + func, (function (_f) {
-									var f = _f;
-									return function (req, res) {
-												api[f](req.body, function(resObj, callback) {
-																		res.json(resObj);
-																		callback();
-																	});
-											}
-								})(func));	
-	}
-
-	// in case of requesting a inexisteng url
-	app.all('/*', function (req, res, next) {
-		res.json(500, { error: 'Something went horribly wrong' });
-	});
-
-	app.listen(port);
-	console.log('Server process listening at port: ' + port);
 };
 
 exports.createServer = createServer;

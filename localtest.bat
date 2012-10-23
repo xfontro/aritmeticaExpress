@@ -1,0 +1,1 @@
+ab -n %1 -c %2 -T "application/json" -p "post.txt" -x 127.0.0.1 "http://127.0.0.1:3000/publish"
