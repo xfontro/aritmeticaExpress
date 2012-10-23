@@ -21,6 +21,7 @@ var createServer = function (api, port) {
 
 	// all http posts accept json only
 	app.post('/*', function (req, res, next) {
+		//console.log('In publisher ALL, req: ' + req.body[0]);
 		req.accepts('application/json');
 		next();
 	});
@@ -30,9 +31,9 @@ var createServer = function (api, port) {
 		app.post('/' + func, (function (_f) {
 									var f = _f;
 									return function (req, res) {
-												api[f](req.body, function(resObj, callback) {
-																		res.json(resObj);
-																		callback();
+												//console.log('In publisher, req: ' + req.body[0]);
+ 												api[f](req.body, function(resObj) {
+																		res.json(resObj);	
 																	});
 											}
 								})(func));	
