@@ -22,21 +22,19 @@ var api = {
 	publish: ops.publish
 };
 
-if(!ops.start()){
-	console.log("RabbitMq connection is not listening yet...");
-}
+ops.start(function(){
+	var port = process.env.port || args.port;
 
-var port = process.env.port || args.port;
-
-if (args.cluster) {
-	require('./clustermanager').childSpawn(
-		args.processes || require('os').cpus().length,
-		function (id) { 
-			console.log('cluster: worker ' + id);
-			publisher.createServer(api, port); 
-		}
-	);
-} else {
-	console.log('No cluster, listen on port: ' + port);
-	publisher.createServer(api, port);
-}
+	if (args.cluster) {
+		require('./clustermanager').childSpawn(
+			args.processes || require('os').cpus().length,
+			function (id) { 
+				console.log('cluster: worker ' + id);
+				publisher.createServer(api, port); 
+			}
+		);
+	} else {
+		console.log('No cluster, listen on port: ' + port);
+		publisher.createServer(api, port);
+	}
+});

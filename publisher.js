@@ -2,8 +2,6 @@
 // LGPL
 
 var express = require('express');
-var http = require('http');
-var fs = require('fs');
 
 var createServer = function (api, port) {
 	var app = express();
@@ -21,7 +19,6 @@ var createServer = function (api, port) {
 
 	// all http posts accept json only
 	app.post('/*', function (req, res, next) {
-		//console.log('In publisher ALL, req: ' + req.body[0]);
 		req.accepts('application/json');
 		next();
 	});
@@ -31,7 +28,6 @@ var createServer = function (api, port) {
 		app.post('/' + func, (function (_f) {
 									var f = _f;
 									return function (req, res) {
-												//console.log('In publisher, req: ' + req.body[0]);
  												api[f](req.body, function(resObj) {
 																		res.json(resObj);	
 																	});
@@ -39,7 +35,7 @@ var createServer = function (api, port) {
 								})(func));	
 	}
 
-	// in case of requesting a inexisteng url
+	// in case of requesting a inexisting url
 	app.all('/*', function (req, res, next) {
 		res.json(500, { error: 'Something went horribly wrong' });
 	});
