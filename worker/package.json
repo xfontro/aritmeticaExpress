@@ -1,0 +1,11 @@
+{
+  "name": "workerAritmetica",
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "start": "node worker"
+  },
+  "dependencies": {
+    "amqp": ">= 0.1.0"
+  }
+}

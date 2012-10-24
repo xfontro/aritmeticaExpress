@@ -22,8 +22,9 @@ var api = {
 	publish: ops.publish
 };
 
+ 
 ops.start(function(){
-	var port = process.env.port || args.port;
+	var port = process.env.VCAP_APP_PORT || args.port;
 
 	if (args.cluster) {
 		require('./clustermanager').childSpawn(

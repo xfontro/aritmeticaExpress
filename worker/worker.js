@@ -1,11 +1,24 @@
 var amqp = require('amqp');
 
-var connection = amqp.createConnection({url: 'amqp://localhost'});
+var connection = amqp.createConnection({url: rabbitUrl()});
 
-    connection.on('ready', function(){
+var http = require('http');
+http.createServer(function (req, res){}).listen(process.env.VCAP_APP_PORT);
+
+
+function rabbitUrl() {
+  if (process.env.VCAP_SERVICES) {
+    conf = JSON.parse(process.env.VCAP_SERVICES);
+    return conf['rabbitmq-2.4'][0].credentials.url;
+  }
+  else {
+    return "amqp://localhost";
+  }
+}
+
+connection.on('ready', function(){
     connection.queue('taskQueue', function(queue)
     {
-
         console.log(' [*] Waiting for messages. To exit press CTRL+C');
 
         queue.subscribe(function(msg, headers, deliveryInfo, m)
@@ -16,6 +29,8 @@ var connection = amqp.createConnection({url: 'amqp://localhost'});
             for(var i=1; i<body.length; ++i) {
                 result += body[i];
             }
+
+            console.log(result);
 
             connection.publish(m.replyTo, result, {
                 contentType: 'application/json',

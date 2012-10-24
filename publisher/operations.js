@@ -2,8 +2,18 @@ var amqp = require('amqp');
 var connection;
 var rpc;
 
+function rabbitUrl() {
+  if (process.env.VCAP_SERVICES) {
+    conf = JSON.parse(process.env.VCAP_SERVICES);
+    return conf['rabbitmq-2.4'][0].credentials.url;
+  }
+  else {
+    return "amqp://localhost";
+  }
+}
+
 var start = function (callback){
-	connection = amqp.createConnection({ url: 'amqp://localhost'});
+	connection = amqp.createConnection({ url: rabbitUrl()});
 	rpc = new (require('./amqprpc'))(connection);
 	connection.on('ready', function(){
 		callback();
@@ -67,6 +77,7 @@ var publish = function publish (args, response){
       	if(err){
         	console.error(err);
         }else {
+        	console.log(resp);
         	response(resp);
     	}
     });

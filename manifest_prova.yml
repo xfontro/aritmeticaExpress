@@ -1,0 +1,34 @@
+---
+applications:
+  ./publisher:
+    name: publisher
+    framework:
+      name: standalone
+      info:
+        mem: 64M
+        description: Standalone Application
+        exec: 
+    runtime: node08
+    command: node service
+    url: publisherProva.vcap.me
+    mem: '128'
+    instances: 4
+    services:
+      rabbitmq-1a029:
+        type: rabbitmq
+  ./worker:
+    name: worker
+    framework:
+      name: standalone
+      info:
+        mem: 64M
+        description: Standalone Application
+        exec: 
+    runtime: node08
+    command: node worker
+    url: workerProva.vcap.me
+    mem: 64M
+    instances: 2
+    services:
+      rabbitmq-1a029:
+        type: rabbitmq
