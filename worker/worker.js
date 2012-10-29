@@ -9,6 +9,7 @@ http.createServer(function (req, res){}).listen(process.env.VCAP_APP_PORT);
 function rabbitUrl() {
   if (process.env.VCAP_SERVICES) {
     conf = JSON.parse(process.env.VCAP_SERVICES);
+    console.log(conf['rabbitmq-2.4'][0].credentials.url);
     return conf['rabbitmq-2.4'][0].credentials.url;
   }
   else {
@@ -30,10 +31,10 @@ connection.on('ready', function(){
                 result += body[i];
             }
 
-            console.log(result);
+            //console.log(result);
 
             connection.publish(m.replyTo, result, {
-                contentType: 'application/json',
+                contentType: 'application/json', // This may also be m.contentType
                 correlationId: m.correlationId
             });
         });

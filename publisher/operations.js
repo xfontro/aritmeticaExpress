@@ -5,6 +5,7 @@ var rpc;
 function rabbitUrl() {
   if (process.env.VCAP_SERVICES) {
     conf = JSON.parse(process.env.VCAP_SERVICES);
+    //console.log(conf['rabbitmq-2.4'][0].credentials.url);
     return conf['rabbitmq-2.4'][0].credentials.url;
   }
   else {
@@ -77,7 +78,7 @@ var publish = function publish (args, response){
       	if(err){
         	console.error(err);
         }else {
-        	console.log(resp);
+        	//console.log(resp);
         	response(resp);
     	}
     });

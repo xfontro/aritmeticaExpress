@@ -1,9 +1,0 @@
-{
-  "name": "workerAritmetica",
-  "version": "0.0.1",
-  "dependencies": {
-    "amqp": {
-      "version": "0.1.4"
-    }
-  }
-}

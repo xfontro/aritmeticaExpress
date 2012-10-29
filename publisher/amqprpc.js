@@ -46,7 +46,6 @@ AmqpRpc.prototype.makeRequest = function(queue_name, content, callback){
   });
 }
 
-
 AmqpRpc.prototype.setupResponseQueue = function(next){
   //don't mess around if we have a queue
   if(this.response_queue) return next();
